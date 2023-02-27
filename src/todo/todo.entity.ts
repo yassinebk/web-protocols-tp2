@@ -17,28 +17,8 @@ export class TodoEntity extends EntityWithDates {
   @Column()
   description: string;
 
-  @Column({ default: TodoStatusEnum.waiting })
+  @Column({ enum: TodoStatusEnum, default: TodoStatusEnum.waiting })
   public state: TodoStatusEnum;
 }
-
-// export const SchemaWithDateFields = (entity: EntityClassOrSchema<any>)=>new EntitySchema({
-//   columns: {
-//     createdAt: {
-//       type: Date,
-//       createDate: true,
-//       update:false,
-//     },
-//     updatedAt: {
-//       type: Date,
-//       updateDate: true,
-//     },
-//     deletedAt: {
-//       type: Date,
-//       deleteDate: true,
-//     }
-//   },
-//   name: entity.name,
-//   extends: TodoEntity.name,
-// })
 
 export default TodoEntity;

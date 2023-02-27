@@ -37,38 +37,24 @@ export class TodoService {
     if (!filterTodoDto || (!filterTodoDto.criteria && !filterTodoDto.status)) {
       return this.todoRepository.find({ ...pagination });
     }
-
-    //  const query=this.todoRepository.createQueryBuilder('todo')
-    //   if (filterTodoDto.status)
-    //     query.andWhere('todo.state = :state', {
-    //       state: this.validateState(status),
-    //     });
-    // if (criteria)
-    //   query.andWhere('todo.name = :name or todo.description= :description', {
-    //
-    // return query.getMany();
-
     return this.todoRepository.find({
       where: [
         {
           name: Like(`%${filterTodoDto.criteria}%`),
-          state: this.validateState(filterTodoDto.status),
+          state: filterTodoDto.status,
         },
         {
           description: Like(`%${filterTodoDto.criteria}%`),
-          state: this.validateState(filterTodoDto.status),
+          state: filterTodoDto.status,
         },
-        // {
-        //   state: this.validateState(filterTodoDto.status),
-        // },
       ],
       ...pagination,
     });
   }
 
-  countType(state?: string) {
+  countType(state?: TodoStatusEnum) {
     return this.todoRepository.count({
-      where: { state: this.validateState(state) },
+      where: { state: state },
     });
   }
 
@@ -89,28 +75,21 @@ export class TodoService {
   }
 
   async updateTodo(id: string, newTodoData: UpdatedTodoDto) {
-    const todo = await this.todoRepository.findOneByOrFail({ id });
+    let todo = await this.todoRepository.findOneByOrFail({ id });
 
     if (!todo) {
       throw new HttpException('Todo not found', HttpStatus.NOT_FOUND);
     }
 
-    // mass assignement TODO: Make it more secure
-    todo.name = newTodoData.name;
-    todo.description=newTodoData.description;
-    todo.state = this.validateState(newTodoData.status)??todo.state;
+    todo = {
+      ...newTodoData,
+      ...todo,
+    };
 
-    return  this.todoRepository.save(todo);
+    return this.todoRepository.save(todo);
   }
 
   restoreTodo(id: string) {
     return this.todoRepository.restore(id);
   }
-
-  validateState(state: string): TodoStatusEnum | undefined {
-    if (!state || !['waiting', 'done', 'actif'].includes(state)) return;
-    console.log(TodoStatusEnum[state]);
-    return TodoStatusEnum[state];
-  }
 }
-

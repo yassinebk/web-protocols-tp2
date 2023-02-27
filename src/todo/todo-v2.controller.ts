@@ -1,14 +1,27 @@
 import {
-  Body, Controller, Delete, Get, HttpException, Param, Patch, Post, Put, Query
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
 } from '@nestjs/common';
+import { CountTodosDto } from './dto/count-todo.dto';
 import { FilterTodoPaginatedDto } from './dto/filter-todo.dto';
 import { NewTodoDTO } from './dto/new-todo.dto';
 import { UpdatedTodoDto } from './dto/updated-todo.dto';
 import { TodoService } from './todo.service';
 
-@Controller('todo')
-export class TodoController {
-  constructor(private todosService: TodoService) { }
+@Controller({
+  version: '2',
+  path: 'todo',
+})
+export class TodoControllerV2 {
+  constructor(private todosService: TodoService) {}
 
   @Get()
   getTodos(@Query() filterTodoDto: FilterTodoPaginatedDto) {
@@ -26,9 +39,7 @@ export class TodoController {
 
   @Get(':id')
   getTodo(@Param('id') id: string) {
-    return this.todosService.findOne(
-      id,
-    );
+    return this.todosService.findOne(id);
   }
 
   @Delete(':id')
@@ -47,7 +58,7 @@ export class TodoController {
   }
 
   @Get('count/:state')
-  countTodos(@Param('state') state: string) {
-    return this.todosService.countType(state);
+  countTodos(@Param('state') countTodosDto: CountTodosDto) {
+    return this.todosService.countType(countTodosDto.state);
   }
 }
